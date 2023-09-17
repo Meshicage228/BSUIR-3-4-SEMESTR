@@ -2,6 +2,7 @@
 #include <fstream>
 
 using namespace std;
+ofstream fout;
 
 class MyString {
 private:
@@ -73,6 +74,7 @@ void MyString::setValue(const string &value) {
 }
 
 void menuFunction() {
+    fout.open("values.txt", ofstream::app);
     string quit = "";
     for (;;) {
         cout << "Write value : ";
@@ -88,12 +90,15 @@ void menuFunction() {
 
         cout << "value : " << endl;
         cout << str.getValue() << " its length : " << str.length() << endl;
+        fout << "Initial value : " << str.getValue() << " its length - " << str.length() << endl;
 
         cout << "after trim : " << endl;
         str.trim();
 
         cout << str.getValue() << " its length : " << str.length() << endl;
+        fout << "After trim : " << str.getValue() << " its length - " << str.length() << endl;
         cout << "quit/continue : ";
+
         cin >> quit;
         if (quit == "quit") {
             cout << "end of programm !";
@@ -103,6 +108,7 @@ void menuFunction() {
         }
         cin.ignore();
     }
+    fout.close();
 }
 
 int main() {
