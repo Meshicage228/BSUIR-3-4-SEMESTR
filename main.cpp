@@ -23,6 +23,9 @@ public:
     vector<int> operator&(const Set &set);
 
     vector<int> operator|(const Set &set);
+
+    friend void showGeneralElements(Set &set);
+    friend void showAllElements(Set &set);
 };
 
 vector<int> Set::operator&(const Set &set) {
@@ -55,10 +58,10 @@ Set::~Set() {
     vect.clear();
 }
 
-void showGeneralElements(vector<int> vect){
+void showGeneralElements(Set &set){
     cout << "Result of general elements : " << endl;
     fout << "Result of general elements : " << endl;
-    for (int number: vect) {
+    for (int number: set.vect) {
         cout << number << " ";
         fout << number << " ";
     }
@@ -66,10 +69,10 @@ void showGeneralElements(vector<int> vect){
     cout << endl;
 }
 
-void showAllElements(vector<int> vect){
+void showAllElements(Set &set){
     cout << "Result of merging elements : " << endl;
     fout << "Result of general elements : " << endl;
-    for (int number: vect) {
+    for (int number: set.vect) {
         cout << number << " ";
         fout << number << " ";
     }
@@ -102,8 +105,11 @@ void menuFunction() {
         Set set(arr);
         Set set2(arr2);
 
-        showGeneralElements((set & set2));
-        showAllElements((set | set2));
+        Set setAll = (set | set2);
+        Set setGeneral = (set & set2);
+
+        showGeneralElements(setGeneral);
+        showAllElements(setAll);
 
         cout << "quit/continue : ";
         cin >> quit;
