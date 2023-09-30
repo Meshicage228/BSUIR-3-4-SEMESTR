@@ -1,7 +1,7 @@
 #include<iostream>
-#include<windows.h>
 #include <vector>
 #include <fstream>
+#include <limits>
 
 using namespace std;
 ofstream fout;
@@ -25,6 +25,7 @@ public:
     vector<int> operator|(const Set &set);
 
     friend void showGeneralElements(Set &set);
+
     friend void showAllElements(Set &set);
 };
 
@@ -49,6 +50,15 @@ vector<int> Set::operator|(const Set &set) {
     for (int number: set.vect) {
         answer.push_back(number);
     }
+    for (int i = 1; i < answer.size(); ++i) {
+        for (int k = 0; k < i; ++k) {
+            if (answer.at(i) == answer.at(k)) {
+                answer.erase(answer.begin() + i);
+                --i;
+                break;
+            }
+        }
+    }
     return answer;
 }
 
@@ -58,7 +68,7 @@ Set::~Set() {
     vect.clear();
 }
 
-void showGeneralElements(Set &set){
+void showGeneralElements(Set &set) {
     cout << "Result of general elements : " << endl;
     fout << "Result of general elements : " << endl;
     for (int number: set.vect) {
@@ -69,7 +79,7 @@ void showGeneralElements(Set &set){
     cout << endl;
 }
 
-void showAllElements(Set &set){
+void showAllElements(Set &set) {
     cout << "Result of merging elements : " << endl;
     fout << "Result of general elements : " << endl;
     for (int number: set.vect) {
@@ -79,22 +89,36 @@ void showAllElements(Set &set){
     fout << endl;
     cout << endl;
 }
-vector<int> createVector(){
-    int size = 0;
-    cout << "Write size of your vector : ";
-    cin >> size;
 
+int getIntValue() {
+    int value = 0;
+    while (true) {
+        cin >> value;
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input " << endl;
+        } else
+            break;
+        cout << "Try again" << endl;
+    }
+    return value;
+}
+
+vector<int> createVector() {
+    int size;
+    cout << "Write size of your vector : ";
+    size = getIntValue();
     vector<int> endVector;
-    int values = 0;
-    for(int i = 0; i < size; i++){
-        cout << i+1  << ". number : ";
-        cin >> values;
+    int values;
+    for (int i = 0; i < size; i++) {
+        cout << i + 1 << ". number : ";
+        values = getIntValue();
         endVector.push_back(values);
     }
-
     return endVector;
-
 }
+
 void menuFunction() {
     fout.open("values.txt", ofstream::app);
     string quit = "";
@@ -123,6 +147,7 @@ void menuFunction() {
     }
     fout.close();
 }
+
 int main() {
 
     menuFunction();
