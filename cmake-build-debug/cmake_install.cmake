@@ -1,4 +1,4 @@
-# Install script for directory: D:/C++BSUIR/MainSolution
+# Install script for directory: D:/BSUIR-3-4SEM
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "D:/C++BSUIR/MainSolution/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "D:/BSUIR-3-4SEM/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

@@ -1,3 +1,3 @@
-D:/C++BSUIR/MainSolution/cmake-build-debug/CMakeFiles/MainSolution.dir
-D:/C++BSUIR/MainSolution/cmake-build-debug/CMakeFiles/edit_cache.dir
-D:/C++BSUIR/MainSolution/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+D:/BSUIR-3-4SEM/cmake-build-debug/CMakeFiles/MainSolution.dir
+D:/BSUIR-3-4SEM/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/BSUIR-3-4SEM/cmake-build-debug/CMakeFiles/rebuild_cache.dir
