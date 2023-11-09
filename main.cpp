@@ -1,35 +1,29 @@
 #include <iostream>
 #include <vector>
-
+#include "exceptions.h"
+#include "additionalFunctions.h"
 using namespace std;
-
-class IndexOutOfBoundsException : public exception{
-private:
-    char * message;
-
-public:
-    explicit IndexOutOfBoundsException(char *message) : message(message) {}
-
-    char * what () {
-        return message;
-    }
-};
 
 class AbstractToy {
 protected:
     string name;
     float cost;
 public:
+    AbstractToy(const string &name, float cost) : name(name), cost(cost) {
+        if (cost < 0) {
+            throw NegativeNumberException("Negative number was used while creation object!");
+        }
+    }
+
     virtual void description() {
 
     };
-    AbstractToy(const string &name, float cost, int count) : name(name), cost(cost){}
 
-    const string &getName() const {
+    string &getName(){
         return name;
     }
 
-    float getCost() const {
+    float getCost(){
         return cost;
     }
 
@@ -37,7 +31,11 @@ public:
 
 class CarToy : public AbstractToy {
 public:
-    CarToy(const string &name, float cost, int count) : AbstractToy(name, cost, count) {}
+    CarToy(const string &name, float cost) : AbstractToy(name, cost) {
+        if (cost < 0) {
+            throw NegativeNumberException("Negative number was used while creation object!");
+        }
+    }
 
     void description() override {
         cout << "This is toy " << name << endl;
@@ -47,7 +45,7 @@ public:
 
 class DollToy : public AbstractToy {
 public:
-    DollToy(const string &name, float cost, int count) : AbstractToy(name, cost, count) {}
+    DollToy(const string &name, float cost) : AbstractToy(name, cost) {}
 
     void description() override {
         cout << "This is toy " << name << endl;
@@ -59,14 +57,14 @@ class WhareHouse {
 protected:
     vector<AbstractToy *> arrToys;
 public:
-    explicit WhareHouse(const vector<AbstractToy *> &arrToys) : arrToys(arrToys) {}
+    WhareHouse(const vector<AbstractToy *> &arrToys) : arrToys(arrToys) {}
 
     void showAllToys() {
         for (int i = 0; i < arrToys.size(); i++) {
             cout << i + 1 << ". ";
             arrToys[i]->description();
         }
-
+        cout << endl;
     }
 };
 
@@ -74,38 +72,44 @@ class Customer {
 private:
     string name;
     float countOfMoney;
-    vector<AbstractToy *> whatToBy;
+    vector<AbstractToy *> busket;
 public:
     Customer(const string &name, float countOfMoney, const vector<AbstractToy *> &whatToBy) : name(name), countOfMoney(
-            countOfMoney), whatToBy(whatToBy) {}
-
-    vector<AbstractToy *> &getWhatToBy(){
-        return whatToBy;
+            countOfMoney), busket(whatToBy) {
+        if (countOfMoney < 0) {
+            throw NegativeNumberException("Negative number was used while creation object!");
+        }
     }
-    void showStorage(){
-        cout << "I want to buy : " << endl;
-        if(!whatToBy.empty()) {
-            for (auto &toy: whatToBy) {
+
+    vector<AbstractToy *> &getWhatToBy() {
+        return busket;
+    }
+
+    void showMyBusket() {
+        if (!busket.empty()) {
+            cout << "I want to buy : " << endl;
+            for (auto &toy: busket) {
                 cout << toy->getName() << endl;
             }
-        } else{
-            cout << "Emty storage exception!" << endl;
-            cout << "I didnt decide what to buy..." << endl;
+        } else {
+            cout << "My money : " << countOfMoney << endl;
+            throw EmptyBusketException("You didnt decide what to buy : busket is empty!");
         }
-        if(countSumOfBuying() != 0){
-            cout << "Total pokypka is " << countSumOfBuying() << endl;
+        if (countSumOfBuying() != 0) {
+            cout << "Total sum of your purchase is " << countSumOfBuying() << endl;
         }
         cout << "My money : " << countOfMoney << endl;
     }
-    float countSumOfBuying(){
+
+    float countSumOfBuying() {
         float totalSum = 0;
-        for (auto &toy: whatToBy) {
+        for (auto &toy: busket) {
             totalSum += toy->getCost();
         }
         return totalSum;
     }
 
-    float getCountOfMoney() const {
+    float getCountOfMoney() {
         return countOfMoney;
     }
 
@@ -122,56 +126,50 @@ public:
     Store(const vector<AbstractToy *> &arrToys, Customer *customer) : WhareHouse(arrToys), customer(customer) {}
 
     void showAll() {
-        if(!arrToys.empty()) {
+        if (!arrToys.empty()) {
             WhareHouse::showAllToys();
-        } else{
-            cout << "WhareHouse exception : is empty!" << endl;
+        } else {
+            throw EmptyWhareHouseException("Empty store!!!Nothing to buy yet");
         }
     }
-    void makeBuy(){
+
+    void makeBuy() {
         int index;
         cout << "0. Car" << endl;
         cout << "1. Doll" << endl;
         cout << "Write index of product : " << endl;
-        cin >> index;
-       if(index >= 0 & index < arrToys.size()) {
-               customer->getWhatToBy().push_back(arrToys.at(index));
-       } else{
-           throw IndexOutOfBoundsException("Index out of bounds exception");
+        index = getNum();
+        try{
+            customer->getWhatToBy().push_back(arrToys.at(index));
+        } catch (std::out_of_range &ex){
+            cout << "Out of range!" << endl;
+            throw;
         }
     }
-    void acceptBying(){
-        if(!customer->getWhatToBy().empty()){
-             for(auto & a : customer->getWhatToBy()){
-                    if(customer->getCountOfMoney() - a->getCost() < 0){
-                        break;
-                    }
-                    customer->setCountOfMoney(customer->getCountOfMoney() - a->getCost());
-                    customer->getWhatToBy().pop_back();
-             }
-        }else{
+
+    void acceptBying() {
+        if (!customer->getWhatToBy().empty()) {
+            if (customer->getCountOfMoney() - customer->countSumOfBuying() < 0) {
+                customer->getWhatToBy().clear();
+                throw NotEnogthMoneyException("Not enough money for purchase");
+            } else {
+                customer->setCountOfMoney(customer->getCountOfMoney() - customer->countSumOfBuying());
+                customer->getWhatToBy().clear();
+            }
+        } else {
             cout << "Nothing to buy !" << endl;
         }
     }
+
+    Customer *getCustomer(){
+        return customer;
+    }
 };
-void menu(){
-    cout << "1. Show all toys" << endl;
-    cout << "2. Make buy" << endl;
-    cout << "3. Show my storage" << endl;
-    cout << "4. Accept purchase " << endl;
-    cout << "5. Quit" << endl;
-}
-int main() {
-    vector<AbstractToy*> abs;
-    Customer customer ("Vlad", 1250, abs);
-    CarToy carToy("Car", 100.50, 23);
-    DollToy doll("DollToy", 176.52, 12);
-    vector<AbstractToy *> arrToys = {&carToy, &doll};
-    Store store(arrToys, &customer);
-    int option = 0;
+void mainApp(Store store) {
+    int option;
     do {
         menu();
-        cin >> option;
+        option = getNum();
         switch (option) {
             case 1: {
                 store.showAll();
@@ -180,25 +178,55 @@ int main() {
             case 2: {
                 try {
                     store.makeBuy();
-                } catch (IndexOutOfBoundsException& ex){
-                    cout << ex.what() << endl;
+                } catch (std::out_of_range &ex) {
+                    cout << "Incorrect index! Try again" << endl;
                 }
                 break;
             }
             case 3 : {
-                customer.showStorage();
+                try{
+                    store.getCustomer()->showMyBusket();
+                } catch (EmptyBusketException & ex){
+                    cout << ex.what() << endl;
+                }
                 break;
             }
             case 4 : {
-                store.acceptBying();
+                try {
+                    store.acceptBying();
+                } catch (NotEnogthMoneyException &ex) {
+                    cout << ex.what() << endl;
+                }
                 break;
             }
             case 5 : {
-                return 0;
+                cout << "End of progtramm..." << endl;
             }
             default: {
-                cout << "Wrong option, try again!";
+                cout << "Wrong option, try again!\n";
             }
         }
     } while (option != 5);
+}
+void termFunc() {
+    cout << "Something went wrong! Ending app..." << endl;
+    exit(-1);
+}
+
+int main() {
+    try {
+        set_terminate(termFunc);
+        vector<AbstractToy *> abs;
+        Customer customer("Vlad", 300, abs);
+        CarToy carToy("Car", 100.50);
+        DollToy doll("DollToy", 176.52);
+        vector<AbstractToy *> arrToys = {&carToy, &doll};
+        WhareHouse whareHouse(arrToys);
+        Store store(arrToys, &customer);
+        mainApp(store);
+    }
+    catch (NegativeNumberException &ex) {
+        cout << ex.what() << endl;
+        throw;
+    }
 }
