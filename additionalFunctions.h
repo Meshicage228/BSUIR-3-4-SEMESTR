@@ -5,6 +5,8 @@
 #ifndef MAINSOLUTION_ADDITIONALFUNCTIONS_H
 #define MAINSOLUTION_ADDITIONALFUNCTIONS_H
 #include <iostream>
+ofstream ofs;
+ifstream infile;
 using namespace std;
 int getNum(){
     int number ;
@@ -27,6 +29,7 @@ void menu() {
     cout << "2. Make buy\n";
     cout << "3. Show my storage\n";
     cout << "4. Accept purchase \n";
-    cout << "5. Quit\n";
+    cout << "5. Show history of purchase\n";
+    cout << "6. Quit\n";
 }
 #endif //MAINSOLUTION_ADDITIONALFUNCTIONS_H
