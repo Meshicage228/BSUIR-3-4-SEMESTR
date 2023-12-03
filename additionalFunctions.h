@@ -1,10 +1,7 @@
-//
-// Created by HUAWEI on 09.11.2023.
-//
-
 #ifndef MAINSOLUTION_ADDITIONALFUNCTIONS_H
 #define MAINSOLUTION_ADDITIONALFUNCTIONS_H
 #include <iostream>
+#include <fstream>
 ofstream ofs;
 ifstream infile;
 using namespace std;
@@ -30,6 +27,7 @@ void menu() {
     cout << "3. Show my storage\n";
     cout << "4. Accept purchase \n";
     cout << "5. Show history of purchase\n";
-    cout << "6. Quit\n";
+    cout << "6. Get particular toy\n";
+    cout << "7. Quit\n";
 }
 #endif //MAINSOLUTION_ADDITIONALFUNCTIONS_H
