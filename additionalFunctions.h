@@ -28,6 +28,8 @@ void menu() {
     cout << "4. Accept purchase \n";
     cout << "5. Show history of purchase\n";
     cout << "6. Get particular toy\n";
-    cout << "7. Quit\n";
+    cout << "7. Get all sold toys\n";
+    cout << "8. Sort all \n";
+    cout << "9. Quit\n";
 }
 #endif //MAINSOLUTION_ADDITIONALFUNCTIONS_H

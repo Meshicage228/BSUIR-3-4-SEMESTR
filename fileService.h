@@ -2,6 +2,7 @@
 #define MAINSOLUTION_FILESERVICE_H
 
 #include <iostream>
+#include<algorithm>
 #include "exceptions.h"
 #include "classes.h"
 #include "additionalFunctions.h"
@@ -34,11 +35,11 @@ void makeCheck(Customer *customer) {
         ofs << "customer gave : " << customer->getCountOfMoney() << "$" << endl;
         ofs << "change : " << customer->getCountOfMoney() - customer->countSumOfBuying() << "$" << endl;
         customer->setCountOfMoney(customer->getCountOfMoney() - customer->countSumOfBuying());
-        TOTAL_COUNT += customer->getWhatToBy().size();
+        if(customer->getWhatToBy().size() != 0) {
+           TOTAL_COUNT += customer->getWhatToBy().size();
+        }
         customer->getWhatToBy().clear();
         ofs.close();
-    } else{
-        cout << "Empty history !" << endl;
     }
     file.close();
 }
@@ -62,11 +63,11 @@ void getParticularToy(){
     infile.seekg(0, ios::end);
     int endposition = infile.tellg();
     int size = endposition / sizeof(toy);
-    cout << "Were found " << size << " toys" << endl;
     if(size != -1) {
+        cout << "Were found " << size << " toys" << endl;
         cout << "Write number of toy : " << endl;
         int index = -1;
-        while (index < 0 || index > size){
+        while (index < 0 || index > size) {
             cout << "Write index from 1 to " << size << endl;
             index = getNum();
         }
@@ -75,6 +76,43 @@ void getParticularToy(){
         infile.read(reinterpret_cast<char *>(&toy), sizeof(toy));
         toy->description();
         cout << endl;
+    } else {
+        cout << "No toys detected ! " << endl;
     }
+    infile.close();
+}
+void showAllSoldToys(){
+    fstream file;
+    file.open("storeBusket.dat", ios::binary | ios::app | ios::in);
+    AbstractToy *abstractToy;
+        file.seekg(0);
+        file.read(reinterpret_cast<char *>(&abstractToy), sizeof(abstractToy));
+        int counter = 0;
+        while (!file.eof()) {
+            cout << counter++ << ". " << abstractToy->getName() << " for " << abstractToy->getCost() << "$" << endl;
+            file.read(reinterpret_cast<char *>(&abstractToy), sizeof(abstractToy));
+        }
+    file.close();
+}
+void sortAll(){
+    fstream file;
+    vector<AbstractToy*> result;
+    file.open("storeBusket.dat", ios::binary | ios::app | ios::in);
+    AbstractToy *abstractToy;
+    file.seekg(0);
+    file.read(reinterpret_cast<char *>(&abstractToy), sizeof(abstractToy));
+    while (!file.eof()) {
+        result.push_back(abstractToy);
+        file.read(reinterpret_cast<char *>(&abstractToy), sizeof(abstractToy));
+    }
+    sort(result.begin(), result.end(), [](AbstractToy *first, AbstractToy *second){
+        return (first->getCost() < second->getCost());
+    });
+    file.close();
+    file.open("storeBusket.dat", ios::binary | ios::out);
+    for (auto toy: result) {
+        file.write(reinterpret_cast<char *>(&toy), sizeof(toy));
+    }
+    file.close();
 }
 #endif

@@ -50,15 +50,22 @@ void mainApp(Store *store) {
                 break;
             }
             case 7 : {
+                showAllSoldToys();
+                break;
+            }
+            case 8: {
+                sortAll();
+                break;
+            }
+            case 9 : {
                 break;
             }
             default: {
                 cout << "Wrong option, try again!\n";
             }
         }
-    } while (option != 7);
+    } while (option != 9);
 }
-
 void termFunc() {
     cout << "Something went wrong! Ending app..." << endl;
     exit(-1);
