@@ -7,11 +7,6 @@
 #include <iostream>
 
 using namespace std;
-void menu(){
-    cout << "" << endl;
-    cout << "" << endl;
-    cout << "" << endl;
-}
 int getNum(){
     int number ;
     while (true){
@@ -27,5 +22,14 @@ int getNum(){
         }
     }
     return number;
+}
+void menu(){
+    cout << "1. Find enemy \n";
+    cout << "2. Show achievements \n";
+    cout << "3. Show treasures \n";
+    cout << "4. Show info gold of player \n";
+}
+int makeRandom(int min, int max){
+    return (rand() % (max - min + 1)) + min;
 }
 #endif //MAINSOLUTION_ADDITIONALFUNCTIONS_H

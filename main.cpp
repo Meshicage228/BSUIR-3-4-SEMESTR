@@ -1,38 +1,60 @@
 #include <iostream>
-#include <bits/stdc++.h>
+#include "domain/classes.h"
+#include "utils/additionalFunctions.h"
+#include <cstdlib>
 
 using namespace std;
-void printDuplicates(int arr[], int n)
-{
-    // declaring unordered sets for checking and storing
-    // duplicates
-    unordered_set<int> intSet;
-    unordered_set<int> duplicate;
-
-    // looping through array elements
-    for (int i = 0; i < n; i++) {
-        // if element is not there then insert that
-        if (intSet.find(arr[i]) == intSet.end())
-            intSet.insert(arr[i]);
-        else
-            duplicate.insert(arr[i]);
-    }
-
-    // printing the result
-    cout << "Duplicate item are : ";
-    unordered_set<int>::iterator itr;
-
-    // iterator itr loops from begin() till end()
-    for (itr = duplicate.begin(); itr != duplicate.end(); itr++)
-        cout << *itr << " ";
+void startGame(Game* game){
+    int index;
+    do{
+        menu();
+        cout << "Your option : ";
+        index = getNum();
+        switch (index) {
+            case 1:{
+                game->startFight();
+                break;
+            }
+            case 2:{
+                game->getPlayer()->showAchievements();
+                break;
+            }
+            case 3: {
+                game->getPlayer()->showTreasures();
+                break;
+            }
+            case 4:{
+                game->getPlayer()->infoPlayer();
+                break;
+            }
+            case 5:{
+                cout << "End of the game" << endl;
+                break;
+            }
+        }
+    } while (index != 5);
 }
-
-// Driver code
 int main()
 {
-    int arr[] = { 1, 5, 2, 1, 4, 3, 1, 7, 2, 8, 9, 5 };
-    int n = sizeof(arr) / sizeof(int);
+    srand ( time(NULL) );
+    Chest chest = Chest("chest", 200);
+    Wallet wallet = Wallet("wallet", 40);
+    list<AbstractTreasure* > list;
+    Orc orc = Orc("Orc", 200, 25);
+    Magician magician = Magician("Greate-Magician", 100, 40);
+    MagicianBoss boss = MagicianBoss("Boss-Alkadur", 400, 150);
+    unordered_set<Achievement* > achievement;
+    Player player("Vlad", list, achievement,  0);
 
-    printDuplicates(arr, n);
+    map<int, AbstractTreasure*> treasures;
+    treasures.insert(pair<int, AbstractTreasure *>(1, &chest));
+    treasures.insert(pair<int, AbstractTreasure *>(2, &wallet));
+    map<int, Enemy*> enemies;
+    enemies.insert(pair<int, Enemy*>(1, &magician));
+    enemies.insert(pair<int, Enemy*>(2, &orc));
+    enemies.insert(pair<int, Enemy*>(3, &boss));
+    Game game(treasures, enemies, &player);
+
+    startGame(&game);
     return 0;
 }
