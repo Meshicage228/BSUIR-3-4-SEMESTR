@@ -16,7 +16,7 @@ void startGame(Game* game){
                 break;
             }
             case 2:{
-                game->getPlayer()->showAchievements();
+                game->showAchievements();
                 break;
             }
             case 3: {
@@ -34,8 +34,7 @@ void startGame(Game* game){
         }
     } while (index != 5);
 }
-int main()
-{
+int main(){
     srand ( time(NULL) );
     Chest chest = Chest("chest", 200);
     Wallet wallet = Wallet("wallet", 40);
@@ -43,7 +42,7 @@ int main()
     Orc orc = Orc("Orc", 200, 25);
     Magician magician = Magician("Greate-Magician", 100, 40);
     MagicianBoss boss = MagicianBoss("Boss-Alkadur", 400, 150);
-    unordered_set<Achievement* > achievement;
+    unordered_set<int> achievement;
     Player player("Vlad", list, achievement,  0);
 
     map<int, AbstractTreasure*> treasures;
@@ -53,7 +52,12 @@ int main()
     enemies.insert(pair<int, Enemy*>(1, &magician));
     enemies.insert(pair<int, Enemy*>(2, &orc));
     enemies.insert(pair<int, Enemy*>(3, &boss));
-    Game game(treasures, enemies, &player);
+    map<int, Achievement*> achievements;
+    KilledMobAchievement killed("You killed your first mob!" , 200, 1);
+    FirstTreasureAchievement treasure("First treasure!", 100, 2);
+    achievements.insert(pair<int, Achievement*>(1, &killed));
+    achievements.insert(pair<int, Achievement*>(2, &treasure));
+    Game game(treasures, enemies, achievements ,&player);
 
     startGame(&game);
     return 0;

@@ -1,20 +1,15 @@
-//
-// Created by HUAWEI on 06.12.2023.
-//
-
 #ifndef MAINSOLUTION_CLASSES_H
 #define MAINSOLUTION_CLASSES_H
-
 #include <iostream>
 #include <list>
 #include <unordered_set>
 #include <map>
-
+#include <fstream>
 #include "../exceptions/exceptions.h"
 #include "../utils/additionalFunctions.h"
 
 using namespace std;
-
+fstream fout;
 class Player;
 
 class AbstractTreasure {
@@ -27,15 +22,6 @@ public:
     virtual void info() = 0;
 
     virtual void showAfterVictory() = 0;
-
-    float getCountOfGold() const {
-        return countOfGold;
-    }
-
-    void setCountOfGold(float countOfGold) {
-        this->countOfGold = countOfGold;
-    }
-
 };
 
 class Chest : public AbstractTreasure {
@@ -68,21 +54,17 @@ class Achievement {
 protected:
     string title;
     float countOfGold;
-    bool exists;
+    int numericalOrder;
 public:
-    Achievement(const string &title, float countOfGold, bool exists) : title(title), countOfGold(countOfGold),
-                                                                       exists(exists) {}
+    Achievement(const string &title, float countOfGold, int numericalOrder) : title(title), countOfGold(countOfGold),
+                                                                              numericalOrder(numericalOrder) {}
 
     float getCountOfGold() const {
         return countOfGold;
     }
 
-    bool getExists() const {
-        return exists;
-    }
-
-    void setExists(bool exists) {
-        this->exists = exists;
+    int getNumericalOrder() const {
+        return numericalOrder;
     }
 
     virtual void showMessageAfterVictory() = 0;
@@ -92,23 +74,24 @@ public:
 
 class KilledMobAchievement : public Achievement {
 public:
-    KilledMobAchievement(const string &title, float countOfGold, bool exists) : Achievement(title, countOfGold,
-                                                                                            exists) {}
+    KilledMobAchievement(const string &title, float countOfGold, int numericalOrder) : Achievement(title, countOfGold,
+                                                                                                   numericalOrder) {}
 
     void showMessageAfterVictory() override {
         cout << "New Achievement !!! " << title << ". for that we give you " << countOfGold << endl;
     }
 
     void infoAchievement() override {
-        cout << title << " . for that you earned : " << countOfGold << endl;
+        cout << title << " For that you earned : " << countOfGold << endl;
     }
 
 };
 
 class FirstTreasureAchievement : public Achievement {
 public:
-    FirstTreasureAchievement(const string &title, float countOfGold, bool exists) : Achievement(title, countOfGold,
-                                                                                                exists) {}
+    FirstTreasureAchievement(const string &title, float countOfGold, int numericalOrder) : Achievement(title,
+                                                                                                       countOfGold,
+                                                                                                       numericalOrder) {}
 
     void showMessageAfterVictory() override {
         cout << "New Achievement !!! " << title << " Аor that we give you " << countOfGold << endl;
@@ -133,10 +116,6 @@ public:
 
     float getHealthPoints() const {
         return healthPoints;
-    }
-
-    void setHealthPoints(float healthPoints) {
-        Enemy::healthPoints = healthPoints;
     }
 
     float getCountOfGold() const {
@@ -169,10 +148,6 @@ public:
     void description() override {
         cout << "Magician has arrived !!!! His health : " << healthPoints << endl;
     }
-
-    void showHealth() {
-        cout << "Magician's health : " << Enemy::getHealthPoints() << endl;
-    }
 };
 
 class MagicianBoss : public Magician {
@@ -185,25 +160,21 @@ public:
     void description() override {
         cout << "Magician BOSS has arrived !!!! His health : " << healthPoints << endl;
     }
-
-    void showHealth() {
-        cout << "Magician's health : " << getHealthPoints() << endl;
-    }
 };
 
 class Player {
 private:
     string nameOfHero;
     list<AbstractTreasure *> treasures;
-    unordered_set<Achievement *> achievements;
+    unordered_set<int> achievements;
     float countOfGold;
 public:
-    Player(const string &nameOfHero, const list<AbstractTreasure *> &treasures,
-           const unordered_set<Achievement *> &achievements, float countOfGold) :
-            nameOfHero(nameOfHero), treasures(treasures), achievements(achievements), countOfGold(countOfGold) {}
+    Player(const string &nameOfHero, const list<AbstractTreasure *> &treasures, const unordered_set<int> &achievements,
+           float countOfGold) : nameOfHero(nameOfHero), treasures(treasures), achievements(achievements),
+                                countOfGold(countOfGold) {}
 
 
-    const unordered_set<Achievement *> &getAchievements() const {
+    const unordered_set<int> &getAchievements() const {
         return achievements;
     }
 
@@ -216,15 +187,9 @@ public:
     }
 
     void addAchievement(Achievement *achievement) {
-        if (achievements.count(achievement) == 0 || !achievement->getExists()) {
             achievement->showMessageAfterVictory();
-            achievement->setExists(true);
-            // ПЕРЕЗАПИСЫВАЕТ ДУБЛИКАТ БЛЯ
-            achievements.insert(achievement);
+            achievements.insert(achievement->getNumericalOrder());
             countOfGold += achievement->getCountOfGold();
-        } else {
-            throw NotUniqueAchievementException("");
-        }
     }
 
     void addTreasure(AbstractTreasure *treasure) {
@@ -232,9 +197,16 @@ public:
     }
 
     void infoPlayer() {
+        fout.open("playerInfo.txt", ios::app);
         cout << "Name of the player : " << nameOfHero << endl;
         cout << "Current count of gold : " << countOfGold << endl;
         cout << "Current treasures : " << treasures.size() << endl;
+
+        fout << "Name of the player : " << nameOfHero << endl;
+        fout << "Current count of gold : " << countOfGold << endl;
+        fout << "Current treasures : " << treasures.size() << endl;
+
+        fout.close();
     }
 
     void showTreasures() {
@@ -246,25 +218,19 @@ public:
             }
         }
     }
-
-    void showAchievements() {
-        // TODO FILE
-        if (!achievements.empty()) {
-            cout << "You have " << achievements.size() << " achievements" << endl;
-        } else {
-            cout << "No achievements ! " << endl;
-        }
-    }
 };
 
 class Game {
 private:
     map<int, AbstractTreasure *> randomTreasure;
     map<int, Enemy *> randomEnemy;
+    map<int, Achievement*> achievements;
     Player *player;
 public:
-    Game(const map<int, AbstractTreasure *> &randomTreasure, const map<int, Enemy *> &randomEnemy, Player *player)
-            : randomTreasure(randomTreasure), randomEnemy(randomEnemy), player(player) {}
+    Game(const map<int, AbstractTreasure *> &randomTreasure, const map<int, Enemy *> &randomEnemy,
+         const map<int, Achievement *> &achievements, Player *player) : randomTreasure(randomTreasure),
+                                                                        randomEnemy(randomEnemy),
+                                                                        achievements(achievements), player(player) {}
 
     Player *getPlayer() const {
         return player;
@@ -279,13 +245,15 @@ public:
             cout << "Write number to hit!" << endl;
             float attack = (float) getNum();
             healthOfeEnemy -= attack;
-            cout << "Current health of enemy : " << healthOfeEnemy << endl;
+            if(healthOfeEnemy > 0) {
+                cout << "Current health of enemy : " << healthOfeEnemy << endl;
+            }
         }
         cout << "You won!!! Congratilations ! " << endl;
         cout << "For that mob you earned " << enemy->getCountOfGold() << " coins" << endl;
         player->setCountOfGold(player->getCountOfGold() + enemy->getCountOfGold());
         if (player->getAchievements().empty()) {
-            KilledMobAchievement achievement("First killed mob!", 200, false);
+            KilledMobAchievement achievement("First killed mob!", 200, 1);
            try{
                player->addAchievement(&achievement);
            } catch (NotUniqueAchievementException& ex){
@@ -298,7 +266,7 @@ public:
             auto treasure = randomTreasure.find(key)->second;
             treasure->showAfterVictory();
             player->addTreasure(treasure);
-            FirstTreasureAchievement first("First treasure ! ", 400, false);
+            FirstTreasureAchievement first("First treasure ! ", 400, 2);
             try{
                 player->addAchievement(&first);
             } catch (NotUniqueAchievementException& ex){
@@ -306,6 +274,15 @@ public:
             }
         }
     }
+    void showAchievements() {
+        if (!player->getAchievements().empty()) {
+            for(auto& it : player->getAchievements()){
+                auto achiv  = achievements.find(it)->second;
+                achiv->infoAchievement();
+            }
+        } else {
+            cout << "No achievements ! " << endl;
+        }
+    }
 };
-
-#endif //MAINSOLUTION_CLASSES_H
+#endif
